@@ -17,8 +17,9 @@ service AuthV1 {
 }
 
 enum Role {
-  USER = 0;
-  ADMIN = 1;
+  UNKNOWN = 0;
+  USER = 1;
+  ADMIN = 2;
 }
 
 message CreateRequest {
@@ -49,7 +50,7 @@ message GetResponse {
 message UpdateRequest {
   int64 id = 1;
   google.protobuf.StringValue name = 2;
-  google.protobuf.StringValue email = 3;
+  string email = 3;
   Role role = 4;
 }
 
