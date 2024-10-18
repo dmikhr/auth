@@ -1,0 +1,33 @@
+# https://www.maxai.me/ai-tools/ai-chat/?id=b8bf9354-9378-4394-979b-ab0bc3179892_3c284d3d-eabd-4d4d-9644-6cea2aeba832_ad450880-760e-4700-b379-8190d3484223_82f2e19d-55a5-45cd-a74d-c371d1df5c28_10c74add-8514-4b7d-a497-faf54ade1c76_4e37c8bd-3161-45ed-a492-741359d5320b
+# app user
+version: '3'
+
+volumes:
+  auth_db:
+
+services:
+  pg:
+    image: postgres:14-alpine3.17
+    environment:
+      - "POSTGRES_DB=${PG_DATABASE_NAME}"
+      - "POSTGRES_USER=${PG_USER}"
+      - "POSTGRES_PASSWORD=${PG_PASSWORD}"
+    ports:
+      - "${PG_PORT}:5432"
+    volumes:
+      - auth_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER}"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+  migrator:
+    depends_on:
+      pg:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: migration.Dockerfile
+    restart: on-failure
+    environment:
+      DB_HOST: pg
